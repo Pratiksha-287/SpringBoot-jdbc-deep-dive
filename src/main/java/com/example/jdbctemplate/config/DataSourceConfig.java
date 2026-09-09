@@ -24,39 +24,44 @@ public class DataSourceConfig {
     @ConfigurationProperties(prefix = "spring.datasource.mysql.jdbc")
     public HikariDataSource mySQLDataSource() {
 
-            System.out.println("in the datasource");
-
-            HikariDataSource dataSource = DataSourceBuilder
+            return DataSourceBuilder
                     .create()
                     .type( HikariDataSource.class)
                     .build();
-
-            System.out.println("===== MYSQL DATASOURCE =====");
-            System.out.println("URL      = " + dataSource.getJdbcUrl());
-        System.out.println("Username = " + dataSource.getUsername());
-        System.out.println("Driver   = " + dataSource.getDriverClassName());
-        System.out.println("Pool     = " + dataSource.getPoolName());
-            return dataSource;
         }
     
 
-    // @ConfigurationProperties(prefix = "spring.datasource.postgres.jdbc")
-    // @Bean("postgresDataSource")
-    // public DataSource postgresDataSource() {
-    //     return DataSourceBuilder
-    //             .create()
-    //             .type(HikariDataSource.class)
-    //             .build();
-    // }
+    @ConfigurationProperties(prefix = "spring.datasource.postgres.jdbc")
+    @Bean("postgresDataSource")
+    public HikariDataSource postgresDataSource() {
+        return DataSourceBuilder
+                .create()
+                .type(HikariDataSource.class)
+                .build();
+    }
+
+    @Bean("postgresJdbcTemplate")
+    public JdbcTemplate postgresJdbcTemplate(@Qualifier("postgresDataSource")   HikariDataSource datasource) {
+        return new JdbcTemplate(datasource);
+    }
+    @Bean("postgresNamedJdbcTemplate")
+    public NamedParameterJdbcTemplate postgresNamedJdbcTemplate(@Qualifier("postgresDataSource") HikariDataSource datasource) throws SQLException {
+        System.out.println("===== POSTGRESQL DATASOURCE =====");
+        System.out.println("URL      = " + datasource.getConnection().getMetaData().getURL());
+        System.out.println("Username = " + datasource.getConnection().getMetaData().getUserName());
+        System.out.println("Driver   = " + datasource.getConnection().getMetaData().getDriverName());
+        return new NamedParameterJdbcTemplate(datasource);
+    }
+
     
     @Primary 
     @Bean("mySQLJdbcTemplate")
-    public JdbcTemplate mySQLJdbcTemplate(@Qualifier("mySQLDataSource") DataSource dataSource) throws SQLException {
+    public JdbcTemplate mySQLJdbcTemplate(@Qualifier("mySQLDataSource") HikariDataSource dataSource) throws SQLException {
         System.out.println("===== MYSQL DATASOURCE =====");
         System.out.println("URL      = " + dataSource.getConnection().getMetaData().getURL());
-        // System.out.println("Username = " + dataSource.getUsername());
-        // System.out.println("Driver   = " + dataSource.getDriverClassName());
-        // System.out.println("Pool     = " + dataSource.getPoolName());
+        System.out.println("Username = " + dataSource.getConnection().getMetaData().getUserName());
+        System.out.println("Driver   = " + dataSource.getConnection().getMetaData().getDriverName());
+        // System.out.println("Pool     = " + dataSource.getConnection().getMetaData().getPoolName());
         return new JdbcTemplate(dataSource);
     }
 

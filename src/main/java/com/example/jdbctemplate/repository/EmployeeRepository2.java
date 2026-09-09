@@ -11,25 +11,36 @@ import com.example.jdbctemplate.entity.Employee;
 
 @Repository
 public class EmployeeRepository2 {
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    public EmployeeRepository2(@Qualifier("mySQLNamedJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        System.out.println("constructor in repo");
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    // private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate mysqlJdbcTemplate;
+    private final NamedParameterJdbcTemplate postgresJdbcTemplate;
+    public EmployeeRepository2(@Qualifier("mySQLNamedJdbcTemplate") NamedParameterJdbcTemplate mysqlJdbcTemplate, @Qualifier("postgresNamedJdbcTemplate") NamedParameterJdbcTemplate postgresJdbcTemplate) {
+        // System.out.println("constructor in repo");
+        this.mysqlJdbcTemplate = mysqlJdbcTemplate;
+        this.postgresJdbcTemplate = postgresJdbcTemplate;
     }
     public int saveEmployee(Employee employee){
         System.out.println("save repo");
-        MapSqlParameterSource m=new MapSqlParameterSource();
-        m.addValue("name", employee.getName());
-        m.addValue("department", employee.getDepartment());
-        m.addValue("salary", employee.getSalary());
+        MapSqlParameterSource m=new MapSqlParameterSource()
+                        .addValue("name", employee.getName())
+                        .addValue("department", employee.getDepartment())
+                        .addValue("salary", employee.getSalary());
         System.out.println("after save repo");
-        return namedParameterJdbcTemplate.update("insert into employee(name, department, salary) values(:name,:department,:salary)", m);
+        String sql = "insert into employee(name, department, salary) values(:name,:department,:salary)";
+        // Save in MySQL
+        int mysqlResult = mysqlJdbcTemplate.update(sql, m);
+
+        // Save in PostgreSQL
+        int postgresResult = postgresJdbcTemplate.update(sql, m);
+
+        return mysqlResult + postgresResult;
+        // return mysqlJdbcTemplate.update("insert into employee(name, department, salary) values(:name,:department,:salary)", m);
     }
     public List<Employee> getAllEmployee(){
-        return namedParameterJdbcTemplate.query("select id, name, department, salary from employee", new MapSqlParameterSource(),new EmployeeRowMapper());
+        return mysqlJdbcTemplate.query("select id, name, department, salary from employee", new MapSqlParameterSource(),new EmployeeRowMapper());
     }
     public Employee getById(Long id){
-        return namedParameterJdbcTemplate.queryForObject("select id, name, department, salary from employee where id=:id", new MapSqlParameterSource("id",id),new EmployeeRowMapper());
+        return mysqlJdbcTemplate.queryForObject("select id, name, department, salary from employee where id=:id", new MapSqlParameterSource("id",id),new EmployeeRowMapper());
     }
     public int updateEmployee(Employee employee, Long id){
         MapSqlParameterSource m=new MapSqlParameterSource()
@@ -37,7 +48,7 @@ public class EmployeeRepository2 {
                                     .addValue("department",employee.getDepartment())
                                     .addValue("salary", employee.getSalary())
                                     .addValue("id",id);
-        return namedParameterJdbcTemplate.update("update employee set name=:name, department=:department, salary=:salary where id=:id",m);
+        return mysqlJdbcTemplate.update("update employee set name=:name, department=:department, salary=:salary where id=:id",m);
     }
     public int updatePatchEmployee(Employee employee, Long id){
         StringBuilder sql=new StringBuilder("update employee set ");
@@ -58,10 +69,10 @@ public class EmployeeRepository2 {
         sql.append(" where id=:id");
         m.addValue("id", id);
 
-        return namedParameterJdbcTemplate.update(sql.toString(),m);
+        return mysqlJdbcTemplate.update(sql.toString(),m);
     }
 
     public int deleteEmployee(Long id){
-        return namedParameterJdbcTemplate.update("delete from employee where id=:id", new MapSqlParameterSource("id",id));
+        return mysqlJdbcTemplate.update("delete from employee where id=:id", new MapSqlParameterSource("id",id));
     }
 }
