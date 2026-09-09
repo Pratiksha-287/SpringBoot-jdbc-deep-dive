@@ -1,6 +1,8 @@
 package com.example.jdbctemplate.repository;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -10,14 +12,17 @@ import com.example.jdbctemplate.entity.Employee;
 @Repository
 public class EmployeeRepository2 {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    public EmployeeRepository2(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public EmployeeRepository2(@Qualifier("mySQLNamedJdbcTemplate") NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        System.out.println("constructor in repo");
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
     public int saveEmployee(Employee employee){
+        System.out.println("save repo");
         MapSqlParameterSource m=new MapSqlParameterSource();
         m.addValue("name", employee.getName());
         m.addValue("department", employee.getDepartment());
         m.addValue("salary", employee.getSalary());
+        System.out.println("after save repo");
         return namedParameterJdbcTemplate.update("insert into employee(name, department, salary) values(:name,:department,:salary)", m);
     }
     public List<Employee> getAllEmployee(){

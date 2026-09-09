@@ -29,6 +29,7 @@ public class EmployeeController {
     }
     @PostMapping("/post")
     public int saveEmployee(@RequestBody Employee employee){
+        System.out.println("controller");
         return employeeService.saveEmployee(employee);
     }
     @GetMapping("/get")

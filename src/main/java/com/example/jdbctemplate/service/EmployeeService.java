@@ -17,6 +17,7 @@ public class EmployeeService {
         this.employeeRepository2 = employeeRepository2;
     }
     public int saveEmployee(Employee employee) {
+        System.out.println("save service");
         return employeeRepository2.saveEmployee(employee);
     }
     public List<Employee> getAllEmployees() {

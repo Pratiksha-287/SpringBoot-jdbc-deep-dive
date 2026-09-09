@@ -3,6 +3,7 @@ package com.example.jdbctemplate.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,8 @@ import com.example.jdbctemplate.entity.Employee;
 @Repository
 public class EmployeeRepository {
     private final JdbcTemplate jdbcTemplate;
-    public EmployeeRepository(JdbcTemplate jdbcTemplate) {
+    
+    public EmployeeRepository( @Qualifier("mySQLJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     public int saveEmployee(Employee employee) {
@@ -52,35 +54,7 @@ public class EmployeeRepository {
         return jdbcTemplate.update(sql.toString(),param.toArray());
        
     
-        // if (employee.getName() != null && employee.getDepartment() != null && employee.getSalary() != null) { 
-        //     sql.append("name=?, department=?, salary=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getName(), employee.getDepartment(), employee.getSalary(), id ); 
-        // } 
-        // if (employee.getName() != null && employee.getDepartment() != null) { 
-        //     sql.append("name=?, department=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getName(), employee.getDepartment(), id ); 
-        // } 
-        // if (employee.getName() != null && employee.getSalary() != null) { 
-        //     sql.append("name=?, salary=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getName(), employee.getSalary(), id ); 
-        // } 
-        // if (employee.getDepartment() != null && employee.getSalary() != null) { 
-        //     sql.append("department=?, salary=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getDepartment(), employee.getSalary(), id ); 
-        // } 
-        // if (employee.getName() != null) { 
-        //     sql.append("name=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getName(), id ); 
-        // } 
-        // if (employee.getDepartment() != null) { 
-        //     sql.append("department=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getDepartment(), id ); 
-        // } 
-        // if (employee.getSalary() != null) { 
-        //     sql.append("salary=? WHERE id=?"); 
-        //     return jdbcTemplate.update( sql.toString(), employee.getSalary(), id ); 
-        // } 
-        // return 0;
+     
     }
     
 }
